@@ -7,13 +7,12 @@ class ContentGenerator {
       apiKey: process.env.GROQ_API_KEY,
     });
     
-    // Modelos actuales disponibles en Groq (2025)
     this.models = [
-      "llama-3.3-70b-versatile",      // Modelo principal recomendado
-      "llama-3.1-8b-instant",        // Más rápido, disponible
-      "gemma2-9b-it",                // Alternativa de Google
-      "llama3-70b-8192",             // Modelo clásico disponible
-      "llama3-8b-8192"               // Modelo rápido disponible
+      "llama-3.3-70b-versatile",
+      "llama-3.1-8b-instant",
+      "gemma2-9b-it",
+      "llama3-70b-8192",
+      "llama3-8b-8192"
     ];
     
     this.currentModelIndex = 0;
@@ -30,7 +29,7 @@ class ContentGenerator {
         messages: [
           {
             role: "system",
-            content: "Eres un experto redactor de contenido SEO especializado en tecnología y economía. Creas artículos optimizados para Google AdSense en español."
+            content: "Eres un redactor experto en tecnología, especializado en crear contenido SEO atractivo, práctico y optimizado para Google AdSense en español. Usas un tono conversacional, pero autoritativo, como si explicaras a un amigo curioso."
           },
           {
             role: "user",
@@ -54,7 +53,7 @@ class ContentGenerator {
 
   buildPrompt(trend) {
     return `
-Crea un artículo SEO optimizado en español basado en esta tendencia:
+Crea un artículo SEO optimizado en español basado en esta tendencia tecnológica:
 
 Título: ${trend.title}
 Categoría: ${trend.category}
@@ -62,25 +61,34 @@ Fuente: ${trend.source}
 ${trend.description ? `Descripción: ${trend.description}` : ''}
 
 Requisitos específicos:
-1. Título SEO optimizado (máximo 60 caracteres)
-2. Meta description atractiva (entre 120-160 caracteres)
-3. Contenido de 800-1200 palabras bien estructurado
-4. Usar encabezados H2 y H3 (formato ## y ###)
-5. Keywords naturales relacionadas con la tendencia
-6. Párrafos cortos y legibles (máximo 3-4 líneas)
-7. Incluir llamadas a la acción
-8. Lenguaje natural y engaging
-9. Optimizado para monetización con AdSense
-10. Contenido original y de calidad
-
-Formato de respuesta EXACTO:
-TÍTULO: [título optimizado aquí]
-META: [meta description aquí]
+1. **Título**: Crea un título atractivo y SEO optimizado (50-60 caracteres) usando una palabra clave de cola larga. Incluye un gancho emocional o práctico (p. ej., "Guía práctica", "¿Qué debes saber?"). Asegúrate de que el título sea claro y no esté vacío.
+2. **Meta descripción**: Escribe una meta descripción atractiva (140-160 caracteres) con la palabra clave principal y un gancho para incentivar clics. No dejes este campo vacío.
+3. **Contenido**: Genera un artículo de 800-1200 palabras, estructurado con:
+   - **Introducción (100-150 palabras)**: Comienza con una pregunta impactante, estadística o anécdota. Explica la tendencia en términos simples, su relevancia para el lector (p. ej., "Cómo afecta a tu negocio") y promete valor (p. ej., "Te contamos cómo aprovecharla").
+   - **Cuerpo (600-900 palabras)**: Usa 3-5 encabezados H2 con palabras clave secundarias. Incluye:
+     - Explicación clara de la tendencia (p. ej., "¿Qué es [tendencia]?").
+     - Soluciones prácticas o casos de uso (p. ej., "Cómo las pymes pueden usar [tendencia]"). Si es posible, añade un enfoque local para hispanohablantes (p. ej., "Impacto en Latam").
+     - Ejemplo o escenario hipotético (p. ej., "Imagina un banco usando [tendencia] para X").
+     - Lista numerada o viñetas para facilitar lectura (p. ej., "5 formas de aplicar [tendencia]").
+     - 1-2 enlaces internos a artículos relacionados y 1-2 externos a sitios de autoridad (p. ej., Wired, TechCrunch).
+   - **Conclusión (100-150 palabras)**: Resume puntos clave, refuerza la importancia de la tendencia e incluye una llamada a la acción (p. ej., "Suscríbete para más guías tech"). Termina con una pregunta para fomentar comentarios.
+4. **SEO**:
+   - Usa la palabra clave principal 3-5 veces de forma natural.
+   - Incluye 2-3 palabras clave de cola larga relacionadas.
+   - Asegura legibilidad (párrafos de 2-3 frases, puntaje Flesch-Kincaid 60-70).
+5. **Tono y estilo**:
+   - Conversacional, pero autoritativo, con toques de storytelling.
+   - Evita frases genéricas (p. ej., "cambiará el mundo"). Usa lenguaje vívido (p. ej., "desbloquea posibilidades revolucionarias").
+6. **Originalidad**:
+   - No copies contenido existente. Ofrece una perspectiva única (p. ej., implicaciones éticas, aplicaciones locales, predicciones).
+7. **Formato de respuesta EXACTO**:
+TÍTULO: [título optimizado]
+META: [meta descripción]
 KEYWORDS: [keyword1, keyword2, keyword3, keyword4, keyword5]
-CONTENIDO: 
-[artículo completo con estructura de encabezados ## y ###]
+CONTENIDO:
+[artículo completo en markdown con ## y ###]
 
-IMPORTANTE: Mantén el formato exacto para que el parser funcione correctamente. El contenido debe ser sustancial y completo.
+IMPORTANTE: Mantén el formato exacto para el parser. Asegúrate de que el título, meta descripción y contenido no estén vacíos. El contenido debe ser completo, útil y optimizado para retención y monetización con AdSense. Si el modelo no puede generar el contenido completo debido a límites de tokens, indica claramente que el artículo está incompleto y sugiere usar un modelo con mayor capacidad.
     `;
   }
 
@@ -121,7 +129,6 @@ IMPORTANTE: Mantén el formato exacto para que el parser funcione correctamente.
       article.content = contentLines.join('\n').trim();
       article.slug = this.generateSlug(article.title);
       
-      // Validar que el artículo tenga contenido mínimo
       if (!article.title || article.title.length < 10) {
         throw new Error('Título del artículo muy corto o vacío');
       }
@@ -150,7 +157,7 @@ IMPORTANTE: Mantén el formato exacto para que el parser funcione correctamente.
     return title
       .toLowerCase()
       .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Remover acentos
+      .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9 -]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
@@ -160,55 +167,65 @@ IMPORTANTE: Mantén el formato exacto para que el parser funcione correctamente.
 
   async calculateSEOScore(article) {
     let score = 0;
-    const maxScore = 100;
     
-    // Título SEO (20 puntos)
+    // Título SEO (30 puntos)
     if (article.title && article.title.length >= 30 && article.title.length <= 60) {
-      score += 20;
+      score += 30;
     } else if (article.title && article.title.length >= 20 && article.title.length <= 70) {
+      score += 15;
+    }
+    
+    // Meta descripción (20 puntos)
+    if (article.metaDescription && article.metaDescription.length >= 120 && article.metaDescription.length <= 160) {
+      score += 20;
+    } else if (article.metaDescription && article.metaDescription.length >= 100 && article.metaDescription.length <= 180) {
       score += 10;
     }
     
-    // Meta description (15 puntos)
-    if (article.metaDescription && article.metaDescription.length >= 120 && article.metaDescription.length <= 160) {
-      score += 15;
-    } else if (article.metaDescription && article.metaDescription.length >= 100 && article.metaDescription.length <= 180) {
-      score += 8;
-    }
-    
-    // Longitud del contenido (25 puntos)
-    if (article.content && article.content.length >= 800 && article.content.length <= 1500) {
-      score += 25;
+    // Longitud del contenido (30 puntos)
+    if (article.content && article.content.length >= 1000 && article.content.length <= 1500) {
+      score += 30;
+    } else if (article.content && article.content.length >= 800 && article.content.length <= 2000) {
+      score += 20;
     } else if (article.content && article.content.length >= 600) {
-      score += 15;
+      score += 10;
     }
     
-    // Densidad de keywords (20 puntos)
+    // Densidad de keywords (25 puntos)
     if (article.keywords && article.keywords.length > 0) {
       const keywordDensity = this.calculateKeywordDensity(article.content, article.keywords);
       if (keywordDensity >= 1 && keywordDensity <= 3) {
-        score += 20;
+        score += 25;
       } else if (keywordDensity >= 0.5 && keywordDensity <= 4) {
-        score += 10;
+        score += 15;
       }
     }
     
-    // Estructura con encabezados (10 puntos)
+    // Estructura con encabezados (15 puntos)
     if (article.content) {
       const hasH2 = article.content.includes('## ');
       const hasH3 = article.content.includes('### ');
-      if (hasH2 && hasH3) score += 10;
-      else if (hasH2 || hasH3) score += 5;
+      if (hasH2 && hasH3) score += 15;
+      else if (hasH2 || hasH3) score += 8;
     }
     
-    // Párrafos bien estructurados (10 puntos)
+    // Párrafos bien estructurados (15 puntos)
     if (article.content) {
       const paragraphs = article.content.split('\n\n').filter(p => p.trim().length > 0);
-      if (paragraphs.length >= 5) score += 10;
+      if (paragraphs.length >= 8) score += 15;
+      else if (paragraphs.length >= 5) score += 10;
       else if (paragraphs.length >= 3) score += 5;
     }
     
-    return Math.min(maxScore, score);
+    // Enlaces internos/externos (10 puntos)
+    if (article.content) {
+      const hasInternalLinks = article.content.includes('(https://tudominio.com');
+      const hasExternalLinks = article.content.match(/https?:\/\/(?!tudominio\.com)/);
+      if (hasInternalLinks && hasExternalLinks) score += 10;
+      else if (hasInternalLinks || hasExternalLinks) score += 5;
+    }
+    
+    return score;
   }
 
   calculateKeywordDensity(content, keywords) {
@@ -228,11 +245,9 @@ IMPORTANTE: Mantén el formato exacto para que el parser funcione correctamente.
     return wordCount > 0 ? (keywordCount / wordCount) * 100 : 0;
   }
 
-  // Método mejorado para retry con diferentes modelos disponibles
   async generateArticleWithFallback(trend) {
     let lastError = null;
     
-    // Intentar con todos los modelos disponibles
     for (let i = 0; i < this.models.length; i++) {
       try {
         this.model = this.models[i];
@@ -247,7 +262,6 @@ IMPORTANTE: Mantén el formato exacto para que el parser funcione correctamente.
         lastError = error;
         console.log(`❌ Error con ${this.model}: ${error.message}`);
         
-        // Si es un error de modelo no disponible, continuar con el siguiente
         if (error.message && (
           error.message.includes('decommissioned') || 
           error.message.includes('not found') ||
@@ -256,19 +270,16 @@ IMPORTANTE: Mantén el formato exacto para que el parser funcione correctamente.
           continue;
         }
         
-        // Si es otro tipo de error y no es el último modelo, continuar
         if (i < this.models.length - 1) {
           continue;
         }
       }
     }
     
-    // Si llegamos aquí, todos los modelos fallaron
     console.error('❌ Todos los modelos fallaron. Último error:', lastError?.message);
     throw new Error(`Error al generar artículo con todos los modelos disponibles. Último error: ${lastError?.message || 'Error desconocido'}`);
   }
 
-  // Método para obtener información de los modelos disponibles
   getAvailableModels() {
     return this.models.map((model, index) => ({
       id: model,
@@ -278,7 +289,6 @@ IMPORTANTE: Mantén el formato exacto para que el parser funcione correctamente.
     }));
   }
 
-  // Método para cambiar modelo manualmente
   switchModel(modelId) {
     const modelIndex = this.models.indexOf(modelId);
     if (modelIndex !== -1) {
