@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+/* const mongoose = require('mongoose');
 const ArticleProcessor = require('./jobs/articleProcessor');
 require('dotenv').config();
 
@@ -16,4 +16,4 @@ async function test() {
   await mongoose.disconnect();
 }
 
-test().catch(console.error);
+test().catch(console.error); */

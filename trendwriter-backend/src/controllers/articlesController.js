@@ -1,9 +1,9 @@
-const Article = require('../models/Articles');
+const Article = require('../models/Article');
 
 exports.getArticles = async (req, res) => {
   try {
-    const { category, limit = 10, sort = '-createdAt', search } = req.query;
-    
+    const { category, sort = '-createdAt', search, limit, page = 1 } = req.query;
+
     const filter = {};
     if (category) filter.category = category;
     if (search) {
@@ -12,16 +12,29 @@ exports.getArticles = async (req, res) => {
         { content: { $regex: search, $options: 'i' } }
       ];
     }
-    
-    const articles = await Article.find(filter)
-      .sort(sort)
-      .limit(parseInt(limit))
-      .exec();
-    
+
+    // Inicializa la query sin ejecutar
+    let query = Article.find(filter).sort(sort);
+
+    // Aplica paginación si se pasa un límite
+    let total;
+    if (limit) {
+      const parsedLimit = parseInt(limit);
+      const parsedPage = parseInt(page);
+      const skip = (parsedPage - 1) * parsedLimit;
+
+      query = query.skip(skip).limit(parsedLimit);
+      total = await Article.countDocuments(filter); // Total sin paginación
+    }
+
+    const articles = await query.exec();
+
     res.json({
       success: true,
       data: articles,
-      total: articles.length
+      total: total ?? articles.length,
+      page: limit ? parseInt(page) : undefined,
+      limit: limit ? parseInt(limit) : undefined
     });
   } catch (error) {
     res.status(500).json({

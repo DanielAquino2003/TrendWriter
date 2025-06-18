@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const Trend = require('../src/models/Trend');
-const Article = require('../src/models/Articles');
+const Article = require('../src/models/Article');
 const ContentGenerator = require('../src/services/ContentGenerator');
 
 class ArticleProcessor {

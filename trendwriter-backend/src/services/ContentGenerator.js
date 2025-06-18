@@ -1,5 +1,5 @@
 const Groq = require('groq-sdk');
-const Article = require('../models/Articles');
+const Article = require('../models/Article');
 
 class ContentGenerator {
   constructor() {
