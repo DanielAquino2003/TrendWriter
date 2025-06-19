@@ -1,6 +1,15 @@
 const mongoose = require('mongoose');
+const { type } = require('os');
 
 const trendSchema = new mongoose.Schema({
+
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false, // No es obligatorio para todos los trends
+    index: true // Índice para búsquedas rápidas por usuario
+  },
+
   title: {
     type: String,
     required: true,
@@ -73,6 +82,11 @@ const trendSchema = new mongoose.Schema({
   }
 });
 
+trendSchema.index({ userId: 1, processed: 1, score: -1 });
+trendSchema.index({ userId: 1, category: 1, createdAt: -1 });
+trendSchema.index({ userId: 1, source: 1, createdAt: -1 });
+trendSchema.index({ userId: 1, score: -1, createdAt: -1 });
+
 // Índices para optimizar consultas
 trendSchema.index({ processed: 1, score: -1 });
 trendSchema.index({ category: 1, createdAt: -1 });
@@ -138,9 +152,39 @@ trendSchema.statics.getProcessableTrends = function(limit = 10) {
   .limit(limit);
 };
 
+trendSchema.statics.getProcessableTrendsByUser = function(userId, limit = 10) {
+  return this.find({
+    userId: userId,
+    processed: false,
+    score: { $gt: 100 },
+    $or: [
+      { processingError: { $exists: false } },
+      { errorCount: { $lt: 3 } }
+    ]
+  })
+  .sort({ score: -1, createdAt: -1 })
+  .limit(limit);
+};
+
 // Método estático para estadísticas
 trendSchema.statics.getStats = function() {
   return this.aggregate([
+    {
+      $group: {
+        _id: null,
+        total: { $sum: 1 },
+        processed: { $sum: { $cond: ['$processed', 1, 0] } },
+        highScore: { $sum: { $cond: [{ $gt: ['$score', 100] }, 1, 0] } },
+        avgScore: { $avg: '$score' },
+        categories: { $addToSet: '$category' }
+      }
+    }
+  ]);
+};
+
+trendSchema.statics.getStatsByUser = function(userId) {
+  return this.aggregate([
+    { $match: { userId: mongoose.Types.ObjectId(userId) } },
     {
       $group: {
         _id: null,

@@ -8,6 +8,9 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     trim: true,
   },
+  password: {
+    type: String,
+  },
   // OAuth2 Integration
   oauthProvider: {
     type: String,
