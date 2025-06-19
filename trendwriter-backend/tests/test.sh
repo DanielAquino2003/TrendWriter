@@ -46,43 +46,21 @@ curl -s -X POST "$AUTH_URL/verify-token" \
   -d "{\"token\": \"$TOKEN\"}"
 echo -e "\n"
 
-# 5. Crear un trend manualmente
-echo "== Creando un trend manualmente =="
-CREATE_TREND_RESPONSE=$(curl -s -X POST "$API_URL/trends" \
+# Redactar un artículo usando el token obtenido
+
+echo -e "\n== Redactando un artículo =="
+REDACT_RESPONSE=$(curl -s -X POST "$API_URL/articles/redact" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "New Trend on AI Tech",
-    "description": "Description of the latest AI trend",
-    "category": "technology"
-  }')
+    "tema": "Inteligencia Artificial en la educación",
+    "contenido": "La IA está transformando el aprendizaje...",
+    "categoria": "tecnología",
+    "slug": "ia-en-educacion",
+    "tono": "informativo",
+    "longitud": "media",
+    "formato": "articulo",
+    "etiquetas": ["IA", "educación", "tecnología"]
+  }' -v)
 
-echo "$CREATE_TREND_RESPONSE"
-TREND_ID=$(echo "$CREATE_TREND_RESPONSE" | jq -r '._id // .id')
-if [[ -z "$TREND_ID" || "$TREND_ID" == "null" ]]; then
-  echo "Error: No se obtuvo ID del trend creado."
-  exit 1
-fi
-
-echo -e "\n== Creando un artículo manualmente =="
-CREATE_ARTICLE_RESPONSE=$(curl -s -X POST "$API_URL/articles" \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "My First Article",
-    "content": "This is the content of my first article on AI.",
-    "category": "technology"
-  }')
-
-echo "$CREATE_ARTICLE_RESPONSE"
-ARTICLE_ID=$(echo "$CREATE_ARTICLE_RESPONSE" | jq -r '._id // .id')
-if [[ -z "$ARTICLE_ID" || "$ARTICLE_ID" == "null" ]]; then
-  echo "Error: No se obtuvo ID del artículo creado."
-  exit 1
-fi
-
-echo -e "\n== Procesando trend en artículo =="
-PROCESS_RESPONSE=$(curl -s -X POST "$API_URL/trends/$TREND_ID/process" \
-  -H "Authorization: Bearer $TOKEN")
-
-echo "$PROCESS_RESPONSE"
+echo "$REDACT_RESPONSE"

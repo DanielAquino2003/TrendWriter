@@ -138,6 +138,7 @@ exports.deleteArticle = async (req, res) => {
 
 const Article = require('../models/Article');
 const User = require('../models/User');
+const articleRedactor = require('../services/articleRedactor'); // o donde esté el archivo
 
 const getPublicArticles = async (req, res) => {
   try {
@@ -158,6 +159,43 @@ const getPublicArticles = async (req, res) => {
   }
 };
 
+const redactArticleController = async (req, res) => {
+  try {
+    const { tema, categoria, slug, tono, longitud, formato, etiquetas } = req.body;
+
+    console.log('Datos recibidos para redactar artículo:', {
+      tema,
+      categoria,
+      slug,
+      tono,
+      longitud,
+      formato,
+      etiquetas,
+    });
+
+    if (!tema || !categoria || !slug || !tono || !longitud || !formato || !etiquetas) {
+      return res.status(400).json({ error: 'Faltan campos requeridos' });
+    }
+
+    const { resultado } = await articleRedactor.redactArticle({
+      tema,
+      categoria,
+      slug,
+      tono,
+      longitud,
+      formato,
+      etiquetas
+    });
+
+    res.json({
+      success: true,
+      data: resultado,
+    });
+  } catch (error) {
+    console.error('Error al redactar el artículo:', error);
+    res.status(500).json({ error: 'Error al redactar el artículo' });
+  }
+};
 
 const getPublicArticleById = async (req, res) => {
   try {
@@ -466,5 +504,6 @@ module.exports = {
   publishUserArticle,
   getUserArticleStats,
   getPublicArticles,
-  getPublicArticleById
+  getPublicArticleById,
+  redactArticleController
 };

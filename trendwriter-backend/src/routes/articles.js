@@ -38,6 +38,8 @@ router.get('/:id', articlesController.getUserArticleById);
 // Crear un nuevo artículo (verificar límites del plan)
 router.post('/', checkPlanLimits('articles'), articlesController.createArticle);
 
+router.post('/redact', /* checkPlanLimits('articles') */ articlesController.redactArticleController);
+
 // Actualizar un artículo del usuario
 router.put('/:id', articlesController.updateUserArticle);
 
