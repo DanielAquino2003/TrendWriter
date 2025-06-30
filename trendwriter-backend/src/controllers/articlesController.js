@@ -142,7 +142,8 @@ const articleRedactor = require('../services/articleRedactor'); // o donde esté
 
 const getPublicArticles = async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit);
+    
     const sortBy = req.query.sortBy || 'createdAt';
 
     const articles = await Article.find({ userId: { $exists: false } }) // solo artículos públicos
@@ -161,30 +162,28 @@ const getPublicArticles = async (req, res) => {
 
 const redactArticleController = async (req, res) => {
   try {
-    const { tema, categoria, slug, tono, longitud, formato, etiquetas } = req.body;
+    const { tema, contexto, idioma, profundidad, longitud, tono } = req.body;
 
     console.log('Datos recibidos para redactar artículo:', {
-      tema,
-      categoria,
-      slug,
-      tono,
-      longitud,
-      formato,
-      etiquetas,
+      tema, 
+      contexto, 
+      idioma, 
+      profundidad, 
+      longitud, 
+      tono
     });
 
-    if (!tema || !categoria || !slug || !tono || !longitud || !formato || !etiquetas) {
+    if (!tema || !contexto || !idioma || !profundidad || !longitud || !tono ) {
       return res.status(400).json({ error: 'Faltan campos requeridos' });
     }
 
     const { resultado } = await articleRedactor.redactArticle({
       tema,
-      categoria,
-      slug,
-      tono,
+      contexto,
+      idioma,
+      profundidad,
       longitud,
-      formato,
-      etiquetas
+      tono
     });
 
     res.json({

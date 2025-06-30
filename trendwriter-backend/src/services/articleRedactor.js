@@ -23,7 +23,7 @@ class ArticleRedactor {
       console.log(`Redactando artículo sobre: ${input.tema} con modelo: ${this.model}`);
 
       // Paso 1: Investigar sobre el tema
-      const detailedInfoPrompt = this.buildResearchPrompt(input.tema);
+      const detailedInfoPrompt = this.buildResearchPrompt(input.tema, input.contexto);
 
       const detailedInfo = await this.askModel(detailedInfoPrompt);
 
@@ -46,11 +46,12 @@ class ArticleRedactor {
     }
   }
 
-  buildResearchPrompt(tema) {
+  buildResearchPrompt(tema, contexto) {
     return `
 Actúa como un investigador experto en redacción de artículos. Proporciona información detallada y actual sobre el siguiente tema para ayudar a redactar un artículo de alta calidad:
 
 TEMA: ${tema}
+CONTEXTO: ${contexto}
 
 Incluye:
 - Definición clara del tema.
@@ -66,64 +67,64 @@ Devuelve el contenido en texto plano, bien redactado, claro y sin formato adicio
 
   buildArticlePrompt({
     tema,
-    categoria,
-    formato,
-    slug,
-    etiquetas,
-    tono = 'informativo',
-    longitud = 'Medio (1000 palabras)',
+    contexto,
+    idioma,
+    profundidad,
+    tono,
+    longitud,
     informacion,
   }) {
     const longitudMap = {
       'Corto (500 palabras)': '500',
       'Medio (1000 palabras)': '1000',
       'Largo (2000+ palabras)': '2000',
+      'Muy largo (3000+ palabras)': '3000',
     };
 
     const wordCount = longitudMap[longitud] || '1000';
 
     return `
-Crea un artículo original, bien escrito y optimizado para SEO en español sobre el siguiente tema:
+Crea un artículo original y optimizado para SEO, en formato markdown listo para ser parseado a texto, con las siguientes características:
 
-TEMA: ${tema}
-CATEGORÍA: ${categoria}
-FORMATO: ${formato}
-SLUG: ${slug}
-ETIQUETAS: ${etiquetas}
-TONO: ${tono}
-LONGITUD: ${longitud} (${wordCount} palabras aprox.)
+- Tema: ${tema}  
+- Idioma: ${idioma}  
+- Contexto: ${contexto}  
+- Tono: ${tono}  
+- Profundidad: ${profundidad} (ej. básico, intermedio, experto)  
+- Longitud: ${longitud} (en palabras aprox.)  
+- Información adicional: ${informacion}
 
-INFORMACIÓN DE CONTEXTO:
-${informacion}
+Instrucciones:
 
-REQUISITOS:
-1. **Título**: Atractivo, SEO optimizado (50-60 caracteres), con palabra clave de cola larga y gancho emocional/práctico.
-2. **Meta descripción**: 140-160 caracteres con la palabra clave principal. Debe invitar al clic.
-3. **Cuerpo del artículo**:
-   - Introducción (100-150 palabras): pregunta o anécdota inicial, relevancia del tema, promesa de valor.
-   - Desarrollo (adaptado a ${wordCount} palabras): usa 3-6 encabezados H2 y H3 con subtítulos claros. Incluye:
-     - Explicación de "${tema}"
-     - Ejemplos aplicados, historias o casos de uso
-     - Listas o viñetas con tips o puntos clave
-     - 1-2 enlaces internos y 1-2 externos (ej: Wired, Harvard Business Review)
-   - Conclusión (100-150 palabras): resumen, llamado a la acción, reflexión final.
+1. Título: atractivo, emocional o práctico, de 50-60 caracteres, con palabra clave de cola larga.
+2. Meta descripción: 140-160 caracteres, incluye la palabra clave principal y llama al clic.
+3. Estructura:
+   - Introducción (100-150 palabras): pregunta inicial, anécdota o contexto; explica la relevancia del tema.
+   - Desarrollo (ajustado a la longitud total): usa entre 3 y 6 secciones con subtítulos H2/H3 claros. Incluye:
+     - Explicación del tema
+     - Ejemplos o casos de uso
+     - Listas o viñetas con puntos clave
+     - 1-2 enlaces externos confiables y 1-2 enlaces internos simulados
+   - Conclusión (100-150 palabras): resumen, reflexión y llamado a la acción.
+4. SEO:
+   - Repite la palabra clave principal 3-5 veces
+   - Incluye 3-5 palabras clave relacionadas
+   - Párrafos de 2-3 frases, estilo claro y directo
 
-4. **SEO**:
-   - Palabra clave principal repetida 3-5 veces
-   - Palabras clave relacionadas (3-5) incluidas naturalmente
-   - Estilo legible y directo (párrafos de 2-3 frases)
+Formato de salida:
 
-5. **Tono**: Usa un tono ${tono} según lo indicado. Asegúrate de que sea adecuado al lector objetivo. 
+TÍTULO: [Título SEO optimizado]  
+META: [Meta descripción atractiva]  
+KEYWORDS: [keyword1, keyword2, keyword3, keyword4, keyword5]  
+CONTENIDO:  
+## [Encabezado principal]  
+[Introducción]
 
-6. **Formato de respuesta EXACTO**:
-TÍTULO: [título optimizado]
-META: [meta descripción]
-KEYWORDS: [keyword1, keyword2, keyword3, keyword4, keyword5]
-CONTENIDO:
-[artículo completo en markdown usando ## y ###, con viñetas y subtítulos claros]
+### [Subtema o sección]  
+[Desarrollo con viñetas, ejemplos y enlaces]
 
-IMPORTANTE: No dejes campos vacíos. El contenido debe ser original, útil, y optimizado para retención y posicionamiento SEO.
-Si no puedes completarlo, indica que es incompleto y sugiere usar un modelo más grande.
+## Conclusión  
+[Resumen + llamado a la acción]
 `;
   }
 
