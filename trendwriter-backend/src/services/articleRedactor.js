@@ -57,7 +57,6 @@ Incluye:
 - Definición clara del tema.
 - Contexto actual o histórico.
 - Importancia o impacto.
-- Casos de uso reales o aplicaciones.
 - Estadísticas si son relevantes.
 - Desafíos o controversias relacionadas.
 
